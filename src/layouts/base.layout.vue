@@ -8,18 +8,12 @@ import HeroGradient from '../assets/hero-gradient.svg?component';
 import MenuLayout from '../components/MenuLayout.vue';
 import NavbarButtons from '../components/NavbarButtons.vue';
 import { useStyleStore } from '@/stores/style.store';
-import config from '@/config';
-import type { ToolCategory } from '@/tools/tools.types';
-import { useToolStore } from '@/tools/tools.store';
-import { useTracker } from '@/modules/tracker/tracker.services';
+import { config } from '@/config';
 import CollapsibleToolMenu from '@/components/CollapsibleToolMenu.vue';
 
 const themeVars = useThemeVars();
 const styleStore = useStyleStore();
 const version = config.app.version;
-
-const tracker = useTracker();
-const toolStore = useToolStore();
 const { isSmallScreen } = storeToRefs(styleStore);
 </script>
 
@@ -38,6 +32,10 @@ const { isSmallScreen } = storeToRefs(styleStore);
         </RouterLink>
 
         <CollapsibleToolMenu />
+
+        <div class="footer">
+          v{{ version }}
+        </div>
       </div>
     </template>
 
@@ -121,6 +119,14 @@ const { isSmallScreen } = storeToRefs(styleStore);
       color: rgba(255, 255, 255, 0.8);
       z-index: 1;
     }
+  }
+
+  .footer {
+    padding: 15px;
+    font-size: 11px;
+    opacity: 0.6;
+    margin-top: auto;
+    text-align: center;
   }
 }
 </style>
