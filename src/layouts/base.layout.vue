@@ -11,12 +11,14 @@ import { useStyleStore } from '@/stores/style.store';
 import { config } from '@/config';
 import type { ToolCategory } from '@/tools/tools.types';
 import { useToolStore } from '@/tools/tools.store';
+import { useTracker } from '@/modules/tracker/tracker.services';
 import CollapsibleToolMenu from '@/components/CollapsibleToolMenu.vue';
 
 const themeVars = useThemeVars();
 const styleStore = useStyleStore();
 const version = config.app.version;
 
+const tracker = useTracker();
 const toolStore = useToolStore();
 const { isSmallScreen } = storeToRefs(styleStore);
 </script>
@@ -38,36 +40,44 @@ const { isSmallScreen } = storeToRefs(styleStore);
         <CollapsibleToolMenu />
 
         <div class="footer">
-          v{{ version }}
+          <a
+            :href="`https://github.com/CorentinTh/it-tools/releases/tag/v${version}`"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            v{{ version }}
+          </a>
         </div>
       </div>
     </template>
 
     <template #content>
-      <div class="header">
-        <div class="left">
-          <c-button
-            v-if="isSmallScreen"
-            circle
-            variant="text"
-            aria-label="Toggle menu"
-            @click="styleStore.toggleMenu"
-          >
-            <NIcon size="25" :component="Menu2" />
-          </c-button>
-          <RouterLink to="/">
-            <c-button circle variant="text" aria-label="Home">
-              <NIcon size="25" :component="Home2" />
+      <slot name="content-header">
+        <div class="header">
+          <div class="left">
+            <c-button
+              v-if="isSmallScreen"
+              circle
+              variant="text"
+              aria-label="Toggle menu"
+              @click="styleStore.toggleMenu"
+            >
+              <NIcon size="25" :component="Menu2" />
             </c-button>
-          </RouterLink>
-          <slot name="header-left" />
-        </div>
+            <RouterLink to="/">
+              <c-button circle variant="text" aria-label="Home">
+                <NIcon size="25" :component="Home2" />
+              </c-button>
+            </RouterLink>
+            <slot name="header-left" />
+          </div>
 
-        <div class="right">
-          <slot name="header-right" />
-          <NavbarButtons />
+          <div class="right">
+            <slot name="header-right" />
+            <NavbarButtons />
+          </div>
         </div>
-      </div>
+      </slot>
 
       <slot />
     </template>
@@ -93,7 +103,7 @@ const { isSmallScreen } = storeToRefs(styleStore);
 .sider-content {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  height: 100%;
 
   .logo {
     display: block;
@@ -135,6 +145,14 @@ const { isSmallScreen } = storeToRefs(styleStore);
     opacity: 0.6;
     margin-top: auto;
     text-align: center;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }
 </style>
