@@ -51,4 +51,119 @@ const { isSmallScreen } = storeToRefs(styleStore);
           <span v-if="commitSha">
             -
             <a
-              :href="`
+              :href="`https://github.com/CorentinTh/it-tools/commit/${commitSha}`"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ commitSha }}
+            </a>
+          </span>
+        </div>
+      </div>
+    </template>
+
+    <template #content>
+      <slot name="content-header">
+        <div class="header">
+          <div class="left">
+            <c-button
+              v-if="isSmallScreen"
+              circle
+              variant="text"
+              aria-label="Toggle menu"
+              @click="styleStore.toggleMenu"
+            >
+              <NIcon size="25" :component="Menu2" />
+            </c-button>
+            <RouterLink to="/">
+              <c-button circle variant="text" aria-label="Home">
+                <NIcon size="25" :component="Home2" />
+              </c-button>
+            </RouterLink>
+            <slot name="header-left" />
+          </div>
+
+          <div class="right">
+            <slot name="header-right" />
+            <NavbarButtons />
+          </div>
+        </div>
+      </slot>
+
+      <slot />
+    </template>
+  </MenuLayout>
+</template>
+
+<style lang="less" scoped>
+.header {
+  border-bottom: 1px solid v-bind('themeVars.borderColor');
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .left,
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.sider-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .logo {
+    display: block;
+    position: relative;
+    padding: 24px 20px;
+    text-decoration: none;
+    overflow: hidden;
+
+    .hero-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .title {
+      position: relative;
+      font-size: 24px;
+      font-weight: 900;
+      color: #fff;
+      z-index: 1;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      position: relative;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
+      z-index: 1;
+      margin-top: 4px;
+    }
+  }
+
+  .footer {
+    padding: 16px;
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: auto;
+    text-align: center;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+</style>
