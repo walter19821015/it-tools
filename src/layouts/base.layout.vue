@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { NIcon, useThemeVars } from 'naive-ui';
 import { RouterLink } from 'vue-router';
-import { Home2, Menu2 } from '@vicons/tabler';
+import { Heart, Home2, Menu2 } from '@vicons/tabler';
 
 import { storeToRefs } from 'pinia';
 import HeroGradient from '../assets/hero-gradient.svg?component';
@@ -9,11 +9,15 @@ import MenuLayout from '../components/MenuLayout.vue';
 import NavbarButtons from '../components/NavbarButtons.vue';
 import { useStyleStore } from '@/stores/style.store';
 import { config } from '@/config';
+import type { ToolCategory } from '@/tools/tools.types';
+import { useToolStore } from '@/tools/tools.store';
 import CollapsibleToolMenu from '@/components/CollapsibleToolMenu.vue';
 
 const themeVars = useThemeVars();
 const styleStore = useStyleStore();
 const version = config.app.version;
+
+const toolStore = useToolStore();
 const { isSmallScreen } = storeToRefs(styleStore);
 </script>
 
@@ -56,9 +60,11 @@ const { isSmallScreen } = storeToRefs(styleStore);
               <NIcon size="25" :component="Home2" />
             </c-button>
           </RouterLink>
+          <slot name="header-left" />
         </div>
 
         <div class="right">
+          <slot name="header-right" />
           <NavbarButtons />
         </div>
       </div>
@@ -70,11 +76,11 @@ const { isSmallScreen } = storeToRefs(styleStore);
 
 <style lang="less" scoped>
 .header {
+  border-bottom: 1px solid v-bind('themeVars.borderColor');
+  padding: 10px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  border-bottom: 1px solid v-bind('themeVars.borderColor');
 
   .left,
   .right {
@@ -87,12 +93,12 @@ const { isSmallScreen } = storeToRefs(styleStore);
 .sider-content {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
 
   .logo {
     display: block;
     position: relative;
-    padding: 20px;
+    padding: 24px 20px;
     text-decoration: none;
     overflow: hidden;
 
@@ -108,22 +114,24 @@ const { isSmallScreen } = storeToRefs(styleStore);
     .title {
       position: relative;
       font-size: 24px;
-      font-weight: bold;
+      font-weight: 900;
       color: #fff;
       z-index: 1;
+      line-height: 1.2;
     }
 
     .subtitle {
       position: relative;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.8);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.85);
       z-index: 1;
+      margin-top: 4px;
     }
   }
 
   .footer {
-    padding: 15px;
-    font-size: 11px;
+    padding: 16px;
+    font-size: 12px;
     opacity: 0.6;
     margin-top: auto;
     text-align: center;
