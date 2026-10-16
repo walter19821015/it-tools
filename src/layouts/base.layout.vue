@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { NIcon, useThemeVars } from 'naive-ui';
+
 import { RouterLink } from 'vue-router';
-import { Home2, Menu2 } from '@vicons/tabler';
+import { Heart, Home2, Menu2 } from '@vicons/tabler';
 
 import { storeToRefs } from 'pinia';
-import SearchBar from '../components/SearchBar.vue';
 import HeroGradient from '../assets/hero-gradient.svg?component';
 import MenuLayout from '../components/MenuLayout.vue';
 import NavbarButtons from '../components/NavbarButtons.vue';
@@ -20,160 +20,198 @@ const styleStore = useStyleStore();
 const version = config.app.version;
 const commitSha = config.app.lastCommitSha.slice(0, 7);
 
-const tracker = useTracker();
+const { tracker } = useTracker();
+const { t } = useI18n();
+
 const toolStore = useToolStore();
-const { isSmallScreen } = storeToRefs(styleStore);
+const { favoriteTools, toolsByCategory } = storeToRefs(toolStore);
+
+const tools = computed<ToolCategory[]>(() => [
+  ...(favoriteTools.value.length > 0 ? [{ name: t('tools.categories.favorite-tools'), components: favoriteTools.value }] : []),
+  ...toolsByCategory.value,
+]);
 </script>
 
 <template>
-  <MenuLayout>
+  <MenuLayout class="menu-layout" :class="{ isSmallScreen: styleStore.isSmallScreen }">
     <template #sider>
-      <div class="sider-content">
-        <RouterLink to="/" class="logo">
-          <HeroGradient class="hero-gradient" />
+      <RouterLink to="/" class="hero-wrapper">
+        <HeroGradient class="gradient" />
+        <div class="text-wrapper">
           <div class="title">
             IT - TOOLS
           </div>
+          <div class="divider" />
           <div class="subtitle">
             {{ $t('home.subtitle') }}
           </div>
-        </RouterLink>
+        </div>
+      </RouterLink>
 
-        <CollapsibleToolMenu />
+      <div class="sider-content">
+        <div v-if="styleStore.isSmallScreen" flex flex-col items-center>
+          <locale-selector w="90%" />
+
+          <div flex justify-center>
+            <NavbarButtons />
+          </div>
+        </div>
+
+        <CollapsibleToolMenu :tools-by-category="tools" />
 
         <div class="footer">
-          <a
-            :href="`https://github.com/CorentinTh/it-tools/releases/tag/v${version}`"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            v{{ version }}
-          </a>
-          <span v-if="commitSha">
-            -
-            <a
-              :href="`https://github.com/CorentinTh/it-tools/commit/${commitSha}`"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {{ commitSha }}
-            </a>
-          </span>
+          <div>
+            IT-Tools
+
+            <c-link target="_blank" rel="noopener" :href="`https://github.com/CorentinTh/it-tools/tree/v${version}`">
+              v{{ version }}
+            </c-link>
+
+            <template v-if="commitSha && commitSha.length > 0">
+              -
+              <c-link
+                target="_blank"
+                rel="noopener"
+                type="primary"
+                :href="`https://github.com/CorentinTh/it-tools/tree/${commitSha}`"
+              >
+                {{ commitSha }}
+              </c-link>
+            </template>
+          </div>
+          <div>
+            © {{ new Date().getFullYear() }}
+            <c-link target="_blank" rel="noopener" href="https://corentin.tech?utm_source=it-tools&utm_medium=footer">
+              Corentin Thomasset
+            </c-link>
+          </div>
         </div>
       </div>
     </template>
 
     <template #content>
-      <div class="header">
-        <div class="left">
-          <c-button
-            v-if="isSmallScreen"
-            circle
-            variant="text"
-            aria-label="Toggle menu"
-            @click="styleStore.toggleMenu"
-          >
-            <NIcon size="25" :component="Menu2" />
+      <div flex items-center justify-center gap-2>
+        <c-button
+          circle
+          variant="text"
+          :aria-label="$t('home.toggleMenu')"
+          @click="styleStore.isMenuCollapsed = !styleStore.isMenuCollapsed"
+        >
+          <NIcon size="25" :component="Menu2" />
+        </c-button>
+
+        <c-tooltip :tooltip="$t('home.home')" position="bottom">
+          <c-button to="/" circle variant="text" :aria-label="$t('home.home')">
+            <NIcon size="25" :component="Home2" />
           </c-button>
-          <RouterLink to="/">
-            <c-button circle variant="text" aria-label="Home">
-              <NIcon size="25" :component="Home2" />
-            </c-button>
-          </RouterLink>
+        </c-tooltip>
+
+        <c-tooltip :tooltip="$t('home.uiLib')" position="bottom">
+          <c-button v-if="config.app.env === 'development'" to="/c-lib" circle variant="text" :aria-label="$t('home.uiLib')">
+            <icon-mdi:brush-variant text-20px />
+          </c-button>
+        </c-tooltip>
+
+        <command-palette />
+
+        <locale-selector v-if="!styleStore.isSmallScreen" />
+
+        <div>
+          <NavbarButtons v-if="!styleStore.isSmallScreen" />
         </div>
 
-        <SearchBar class="search-bar" />
-
-        <div class="right">
-          <slot name="header-right" />
-          <NavbarButtons />
-        </div>
+        <c-tooltip position="bottom" :tooltip="$t('home.support')">
+          <c-button
+            round
+            href="https://www.buymeacoffee.com/cthmsst"
+            rel="noopener"
+            target="_blank"
+            class="support-button"
+            :bordered="false"
+            @click="() => tracker.trackEvent({ eventName: 'Support button clicked' })"
+          >
+            {{ $t('home.buyMeACoffee') }}
+            <NIcon v-if="!styleStore.isSmallScreen" :component="Heart" ml-2 />
+          </c-button>
+        </c-tooltip>
       </div>
-
       <slot />
     </template>
   </MenuLayout>
 </template>
 
 <style lang="less" scoped>
-.header {
-  border-bottom: 1px solid v-bind('themeVars.borderColor');
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
+// ::v-deep(.n-layout-scroll-container) {
+//     @percent: 4%;
+//     @position: 25px;
+//     @size: 50px;
+//     @color: #eeeeee25;
+//     background-image: radial-gradient(@color @percent, transparent @percent),
+//         radial-gradient(@color @percent, transparent @percent);
+//     background-position: 0 0, @position @position;
+//     background-size: @size @size;
+// }
 
-  .left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+.support-button {
+  background: rgb(37, 99, 108);
+  background: linear-gradient(48deg, rgba(37, 99, 108, 1) 0%, rgba(59, 149, 111, 1) 60%, rgba(20, 160, 88, 1) 100%);
+  color: #fff !important;
+  transition: padding ease 0.2s !important;
 
-  .search-bar {
-    flex-grow: 1;
-    max-width: 500px;
-  }
-
-  .right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: auto;
+  &:hover {
+    color: #fff;
+    padding-left: 30px;
+    padding-right: 30px;
   }
 }
 
+.footer {
+  text-align: center;
+  color: #838587;
+  margin-top: 20px;
+  padding: 20px 0;
+}
+
 .sider-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  padding-top: 160px;
+  padding-bottom: 200px;
+}
 
-  .logo {
-    display: block;
-    position: relative;
-    padding: 24px 20px;
-    text-decoration: none;
-    overflow: hidden;
+.hero-wrapper {
+  position: absolute;
+  display: block;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  overflow: hidden;
 
-    .hero-gradient {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
+  .gradient {
+    margin-top: -65px;
+  }
+
+  .text-wrapper {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    top: 16px;
+    color: #fff;
 
     .title {
-      position: relative;
-      font-size: 24px;
-      font-weight: 900;
-      color: #fff;
-      z-index: 1;
-      line-height: 1.2;
+      font-size: 25px;
+      font-weight: 600;
+    }
+
+    .divider {
+      width: 50px;
+      height: 2px;
+      border-radius: 4px;
+      background-color: v-bind('themeVars.primaryColor');
+      margin: 0 auto 5px;
     }
 
     .subtitle {
-      position: relative;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.85);
-      z-index: 1;
-      margin-top: 4px;
-    }
-  }
-
-  .footer {
-    padding: 16px;
-    font-size: 12px;
-    opacity: 0.6;
-    margin-top: auto;
-    text-align: center;
-
-    a {
-      color: inherit;
-      text-decoration: none;
-      &:hover {
-        text-decoration: underline;
-      }
+      font-size: 16px;
     }
   }
 }
