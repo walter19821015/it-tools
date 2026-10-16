@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router';
 import { Home2, Menu2 } from '@vicons/tabler';
 
 import { storeToRefs } from 'pinia';
+import SearchBar from '../components/SearchBar.vue';
 import HeroGradient from '../assets/hero-gradient.svg?component';
 import MenuLayout from '../components/MenuLayout.vue';
 import NavbarButtons from '../components/NavbarButtons.vue';
@@ -63,32 +64,31 @@ const { isSmallScreen } = storeToRefs(styleStore);
     </template>
 
     <template #content>
-      <slot name="content-header">
-        <div class="header">
-          <div class="left">
-            <c-button
-              v-if="isSmallScreen"
-              circle
-              variant="text"
-              aria-label="Toggle menu"
-              @click="styleStore.toggleMenu"
-            >
-              <NIcon size="25" :component="Menu2" />
+      <div class="header">
+        <div class="left">
+          <c-button
+            v-if="isSmallScreen"
+            circle
+            variant="text"
+            aria-label="Toggle menu"
+            @click="styleStore.toggleMenu"
+          >
+            <NIcon size="25" :component="Menu2" />
+          </c-button>
+          <RouterLink to="/">
+            <c-button circle variant="text" aria-label="Home">
+              <NIcon size="25" :component="Home2" />
             </c-button>
-            <RouterLink to="/">
-              <c-button circle variant="text" aria-label="Home">
-                <NIcon size="25" :component="Home2" />
-              </c-button>
-            </RouterLink>
-            <slot name="header-left" />
-          </div>
-
-          <div class="right">
-            <slot name="header-right" />
-            <NavbarButtons />
-          </div>
+          </RouterLink>
         </div>
-      </slot>
+
+        <SearchBar class="search-bar" />
+
+        <div class="right">
+          <slot name="header-right" />
+          <NavbarButtons />
+        </div>
+      </div>
 
       <slot />
     </template>
@@ -100,14 +100,25 @@ const { isSmallScreen } = storeToRefs(styleStore);
   border-bottom: 1px solid v-bind('themeVars.borderColor');
   padding: 10px 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 15px;
 
-  .left,
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .search-bar {
+    flex-grow: 1;
+    max-width: 500px;
+  }
+
   .right {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-left: auto;
   }
 }
 
