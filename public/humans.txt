@@ -1,4 +1,8 @@
 /* TEAM */
-Developer: Corentin Thomasset
-Site: https://github.com/CorentinTh
-Twitter: @cthmsst
+Forked and modified by: Walter (walter19821015)
+Original author: Corentin Thomasset
+Site: https://it-tools.tech
+Twitter: @ittoolsdottech
+
+/* THANKS */
+Thanks to all contributors of the original IT-Tools project.

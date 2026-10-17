@@ -24,7 +24,7 @@ export const twitter: OGSchemaType = {
     {
       type: 'input',
       label: 'Creator acc.',
-      placeholder: 'The name of the Twitter account of the creator (ex: @cthmsst)...',
+      placeholder: 'The name of the Twitter account of the creator (ex: @ittoolsdottech)...',
       key: 'twitter:creator',
     },
   ],
